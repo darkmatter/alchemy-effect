@@ -10,6 +10,7 @@ import * as Containers from "./Container/index.ts";
 import * as D1 from "./D1/index.ts";
 import * as KV from "./KV/index.ts";
 import * as R2 from "./R2/index.ts";
+import * as SecretsStore from "./SecretsStore/index.ts";
 import * as Workers from "./Workers/index.ts";
 import * as Workflows from "./Workers/Workflow.ts";
 
@@ -36,6 +37,9 @@ export const providers = () =>
       KV.KVNamespaceBindingPolicy,
       R2.R2Bucket,
       R2.R2BucketBindingPolicy,
+      SecretsStore.SecretBindingPolicy,
+      SecretsStore.SecretsStore,
+      SecretsStore.StoreSecret,
       Random,
       Workers.BindWorkerPolicy,
       Workers.FetchPolicy,
@@ -52,6 +56,9 @@ export const providers = () =>
         KV.KVNamespaceProvider(),
         R2.R2BucketBindingPolicyLive,
         R2.R2BucketProvider(),
+        SecretsStore.SecretBindingPolicyLive,
+        SecretsStore.SecretsStoreProvider(),
+        SecretsStore.StoreSecretProvider(),
         Workers.BindWorkerPolicyLive,
         Workers.FetchPolicyLive,
         Workers.WorkerProvider(),
