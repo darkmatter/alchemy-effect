@@ -5,17 +5,9 @@ import { Resource } from "../../Resource.ts";
 import { Account } from "../Account.ts";
 import type { Providers } from "../Providers.ts";
 
-export type SecretsStoreProps = {
-  /**
-   * Name of the store to adopt. If omitted, the first store found on the
-   * account is adopted automatically.
-   */
-  name?: string;
-};
-
 export type SecretsStore = Resource<
   "Cloudflare.SecretsStore",
-  SecretsStoreProps,
+  {},
   {
     storeId: string;
     storeName: string;
@@ -62,22 +54,9 @@ export const SecretsStoreProvider = () =>
 
       return {
         stables: ["storeId", "storeName", "accountId"],
-        create: Effect.fn(function* ({ news = {} }) {
-          // Always try to adopt an existing store first.
-          // Cloudflare only allows one store per account — deleting it
-          // destroys all secrets and changes the ID, so we avoid ever
-          // creating a second one.
+        create: Effect.fn(function* () {
           const stores = yield* listStores({ accountId });
-          if (news.name) {
-            const match = stores.result.find((s) => s.name === news.name);
-            if (match) {
-              return {
-                storeId: match.id,
-                storeName: match.name,
-                accountId,
-              };
-            }
-          } else if (stores.result.length > 0) {
+          if (stores.result.length > 0) {
             // No name specified — adopt the first (and likely only) store.
             const first = stores.result[0]!;
             return {
@@ -88,10 +67,10 @@ export const SecretsStoreProvider = () =>
           }
 
           // No store exists yet — create one.
-          const name = news.name ?? "secrets";
           const response = yield* createStore({
             accountId,
-            body: [{ name }],
+            //Idk why it needs a name its a global and you never see it
+            body: [{ name: "secret-store" }],
           });
           const store = response.result[0]!;
           return {

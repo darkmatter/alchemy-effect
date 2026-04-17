@@ -1,9 +1,8 @@
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
 import { HttpServerRequest } from "effect/unstable/http/HttpServerRequest";
 import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
-import { ApiKey } from "./Secret.ts";
+import { ApiKey } from "./ApiKey.ts";
 
 export default class Api extends Cloudflare.Worker<Api>()(
   "Api",
@@ -43,5 +42,5 @@ export default class Api extends Cloudflare.Worker<Api>()(
         );
       }),
     };
-  }).pipe(Effect.provide(Layer.mergeAll(Cloudflare.SecretBindingLive))),
+  }).pipe(Effect.provide(Cloudflare.SecretBindingLive)),
 ) {}
