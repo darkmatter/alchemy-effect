@@ -91,6 +91,18 @@
       "worker": "./src/Build/index.ts",
       "import": "./lib/Build/index.js"
     },
+    "./Bun": {
+      "types": "./src/Bun/index.ts",
+      "bun": "./src/Bun/index.ts",
+      "worker": "./src/Bun/index.ts",
+      "import": "./lib/Bun/index.js"
+    },
+    "./Sops": {
+      "types": "./src/Sops/index.ts",
+      "bun": "./src/Sops/index.ts",
+      "worker": "./src/Sops/index.ts",
+      "import": "./lib/Sops/index.js"
+    },
     "./Construct": {
       "types": "./src/Construct/index.ts",
       "bun": "./src/Construct/index.ts",
