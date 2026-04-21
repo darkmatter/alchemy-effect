@@ -1,0 +1,19 @@
+{
+  "name": "bun-ssh-deploy-example",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "deploy": "alchemy deploy",
+    "destroy": "alchemy destroy"
+  },
+  "dependencies": {
+    "@effect/platform-node": "catalog:",
+    "alchemy": "workspace:*",
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

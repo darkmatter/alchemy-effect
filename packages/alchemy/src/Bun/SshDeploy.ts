@@ -9,6 +9,7 @@ import { createHash } from "node:crypto";
 import { isResolved } from "../Diff.ts";
 import * as Provider from "../Provider.ts";
 import { Resource } from "../Resource.ts";
+import type { Providers } from "./Providers.ts";
 
 const sha256Hex = (input: string): string =>
   createHash("sha256").update(input).digest("hex");
@@ -93,7 +94,9 @@ export interface SshDeploy extends Resource<
     deployHash: string;
     /** Where the env file landed on the remote (path only — never the content). */
     envFileRemotePath?: string;
-  }
+  },
+  never,
+  Providers
 > {}
 
 /**
@@ -300,7 +303,11 @@ export const SshDeployProvider = () =>
           Effect.orDie,
         );
 
-      const deploy = (id: string, props: SshDeployProps, session: any) =>
+      const deploy = (
+        id: string,
+        props: SshDeployProps,
+        session: { note: (msg: string) => Effect.Effect<void> },
+      ) =>
         withKeyFile(props.privateKey, (keyPath) =>
           Effect.gen(function* () {
             yield* session.note(`mkdir -p ${props.remotePath}`);
