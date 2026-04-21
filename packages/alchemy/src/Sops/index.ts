@@ -86,6 +86,33 @@ export const sopsDecrypt = (
   }).pipe(Effect.orElseSucceed(() => null));
 
 /**
+ * Decrypt a whole sops-encrypted file and return its plaintext contents.
+ *
+ * `sops` infers the format from the file extension — for a `.env` file
+ * you'll get back raw `KEY=VALUE\n` lines (suitable for systemd's
+ * `EnvironmentFile=`), for YAML/JSON you get the full document.
+ *
+ * Returns `null` on any failure so callers can fall back to an env var
+ * or other source.
+ */
+export const sopsDecryptFile = (
+  file: string,
+): Effect.Effect<string | null> =>
+  Effect.tryPromise({
+    try: async () => {
+      const proc = (globalThis as any).Bun.spawn(["sops", "-d", file], {
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+      const exitCode = await proc.exited;
+      if (exitCode !== 0) return null;
+      const out = await new Response(proc.stdout).text();
+      return out.length > 0 ? out : null;
+    },
+    catch: () => null,
+  }).pipe(Effect.orElseSucceed(() => null));
+
+/**
  * Read `envVar` from the process environment first, otherwise decrypt the
  * named entry from the given sops file. Returns the empty string when
  * both sources fail — see module-level note.
