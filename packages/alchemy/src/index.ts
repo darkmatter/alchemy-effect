@@ -17,6 +17,7 @@ export {
 } from "./Binding.ts";
 export * from "./Destroy.ts";
 export * from "./Diff.ts";
+export * as Env from "./Env.ts";
 export * from "./Input.ts";
 export * from "./InstanceId.ts";
 export * from "./KeyPair.ts";
