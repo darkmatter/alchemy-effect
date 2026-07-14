@@ -75,7 +75,20 @@ export default class Store extends DurableObject<Store>()(
             );
             return undefined;
           }
-          return JSON.parse(new TextDecoder().decode(pt)) as ResourceState;
+          try {
+            return JSON.parse(new TextDecoder().decode(pt)) as ResourceState;
+          } catch (error) {
+            // AES-CTR is unauthenticated: decrypting with a rotated/wrong key
+            // does not throw — it yields garbage bytes that fail JSON.parse
+            // here instead of tripping the catch above. Treat it the same as
+            // a decryption failure so reads degrade to "absent" rather than
+            // dying and turning every state read into an HTTP 500.
+            console.error(
+              "Error parsing decrypted entry. Returning undefined instead.",
+              error,
+            );
+            return undefined;
+          }
         }).pipe(Effect.orDie);
 
       return {
