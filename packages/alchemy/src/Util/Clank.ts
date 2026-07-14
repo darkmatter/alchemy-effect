@@ -21,6 +21,24 @@ export const retryIfCancelled = Effect.retry({
 export const prompt = <T>(
   fn: () => Promise<T | symbol>,
 ): Effect.Effect<T, PromptCancelled> =>
+  Effect.suspend(() => {
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      // Without a TTY the prompt is invisible (piped stdout) and/or can
+      // never receive input (piped stdin) — the process would hang on it
+      // indefinitely. Fail like a user cancellation so callers surface
+      // their non-interactive guidance instead.
+      p.log.error(
+        "An interactive prompt was required but no TTY is attached; " +
+          "failing instead of hanging. Re-run in a terminal or pass --yes.",
+      );
+      return Effect.fail(new PromptCancelled());
+    }
+    return promptWithTty<T>(fn);
+  });
+
+const promptWithTty = <T>(
+  fn: () => Promise<T | symbol>,
+): Effect.Effect<T, PromptCancelled> =>
   Effect.callback<T, PromptCancelled>((resume, signal) => {
     let settled = false;
     fn().then(
