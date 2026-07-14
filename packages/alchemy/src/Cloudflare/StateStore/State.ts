@@ -112,6 +112,22 @@ export const state = () =>
               return httpState;
             }
 
+            if (observed !== undefined && observed > expected) {
+              // The deployed store speaks a NEWER protocol than this CLI.
+              // Redeploying here would downgrade shared, account-level
+              // infrastructure and break every other repo that already
+              // upgraded — the fix is to update this repo's alchemy
+              // package, never to roll the store back.
+              return yield* Effect.die(
+                new AuthError({
+                  message:
+                    `Cloudflare State Store '${scriptName}' is newer than this CLI ` +
+                    `(store v${observed}, this CLI supports v${expected}). ` +
+                    `Update the 'alchemy' package in this repo instead of downgrading the shared store.`,
+                }),
+              );
+            }
+
             // The store is out of date. Upgrade it in place.
             const upgrade = Effect.gen(function* () {
               yield* Clank.info(
@@ -292,6 +308,20 @@ export const bootstrap = (options: BootstrapOptions = {}) =>
       const { matches, expected, observed } =
         yield* checkStateStoreVersion(url);
       const httpState = yield* makeCloudflareStateStore({ url, authToken });
+      if (!matches && observed !== undefined && observed > expected && !force) {
+        // Refuse to downgrade shared account-level infrastructure from an
+        // implicit bootstrap. `--force` remains the explicit escape hatch
+        // for a deliberate rollback.
+        return yield* Effect.die(
+          new AuthError({
+            message:
+              `Cloudflare State Store '${scriptName}' is newer than this CLI ` +
+              `(store v${observed}, this CLI supports v${expected}). ` +
+              `Update the 'alchemy' package instead of downgrading the shared store, ` +
+              `or pass --force to roll it back deliberately.`,
+          }),
+        );
+      }
       if (!matches || force) {
         if (matches && force) {
           yield* Clank.info(
