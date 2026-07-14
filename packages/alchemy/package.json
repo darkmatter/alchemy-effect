@@ -1,12 +1,12 @@
 {
   "name": "alchemy",
-  "version": "2.0.0-beta.61",
+  "version": "2.0.0-beta.61.dm1",
   "homepage": "https://alchemy.run",
   "license": "Apache-2.0",
   "author": "Sam Goodwin <sam@alchemy.run>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alchemy-run/alchemy-effect.git",
+    "url": "git+https://github.com/darkmatter/alchemy-effect.git",
     "directory": "packages/alchemy"
   },
   "bin": {
@@ -307,7 +307,7 @@
     "./bin/exec.js": "./bin/exec.js"
   },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "dependencies": {
     "@alchemy.run/node-utils": "catalog:",
@@ -384,12 +384,12 @@
     "ws": "catalog:"
   },
   "peerDependencies": {
-    "@effect/platform-bun": "catalog:",
-    "@effect/platform-node": "catalog:",
+    "@effect/platform-bun": "4.0.0-beta.94",
+    "@effect/platform-node": "4.0.0-beta.94",
     "@effect/sql-pg": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
-    "effect": "catalog:",
+    "effect": "4.0.0-beta.94",
     "vite": "catalog:",
     "ws": "catalog:"
   },
