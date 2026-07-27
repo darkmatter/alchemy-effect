@@ -31,7 +31,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.14
 
       - name: Configure GitHub Packages auth
         run: |
@@ -39,7 +39,10 @@ jobs:
           echo "@darkmatter:registry=https://npm.pkg.github.com" >> ~/.npmrc
 
       - name: Install
-        run: bun install --frozen-lockfile
+        # minimumReleaseAge in bunfig.toml is time-dependent and breaks
+        # --frozen-lockfile across days; override it to 0 so the committed
+        # lockfile is honored as-is.
+        run: bun install --frozen-lockfile --minimum-release-age=0
 
       - name: Verify tag matches package version
         if: github.ref_type == 'tag'
